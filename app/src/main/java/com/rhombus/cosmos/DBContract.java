@@ -24,13 +24,15 @@ public final class DBContract {
         public static final String COLUMN_NAME_BECON_NUM = "beacon_num";
         public static final String COLUMN_NAME_P1 = "p1";
         public static final String COLUMN_NAME_P2 = "p2";
+        public static final String COLUMN_NAME_P3 = "p3";
 
         public static final String CREATE_TABLE = "CREATE TABLE " +
                 TABLE_NAME + "(" +
                 _ID + " INTEGER PRIMARY KEY," +
                 COLUMN_NAME_BECON_NUM + INT_TYPE + COMMA_SEP +
                 COLUMN_NAME_P1 + DOUBLE_TYPE + COMMA_SEP +
-                COLUMN_NAME_P2 + DOUBLE_TYPE + " )";
+                COLUMN_NAME_P2 + DOUBLE_TYPE + COMMA_SEP +
+                COLUMN_NAME_P3 + DOUBLE_TYPE + " )";
         public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 

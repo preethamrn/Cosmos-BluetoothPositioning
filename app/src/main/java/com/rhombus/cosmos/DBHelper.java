@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -61,6 +63,28 @@ public class DBHelper extends SQLiteOpenHelper {
         return returnList;
     }
 
+    public double[][] getCalibration() {
+        double[][] positions = new double[][]{{0,0,0},{0,0,0},{0,0,0}};
+        String selectQuery = "SELECT * FROM " + DBContract.CalibrationEntry.TABLE_NAME;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to array
+        if (c.moveToFirst()) {
+            do {
+                int i = c.getInt(c.getColumnIndex(DBContract.CalibrationEntry.COLUMN_NAME_BECON_NUM));
+                positions[i][0] = c.getDouble(c.getColumnIndex(DBContract.CalibrationEntry.COLUMN_NAME_P1));
+                positions[i][1] = c.getDouble(c.getColumnIndex(DBContract.CalibrationEntry.COLUMN_NAME_P2));
+                positions[i][2] = c.getDouble(c.getColumnIndex(DBContract.CalibrationEntry.COLUMN_NAME_P3));
+                Log.i("DBHelper", "Positions(" + i + "): " + Arrays.toString(positions[i]));
+            } while (c.moveToNext());
+        }
+        c.close();
+
+        return positions;
+    }
+
     public long addLocation(Location location) {
         ContentValues values = new ContentValues();
         double position[] = location.getPosition();
@@ -74,17 +98,17 @@ public class DBHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public long addCalibration(Calibration c) {
+    public void addCalibration(Calibration c) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(DBContract.CalibrationEntry.DELETE_TABLE);
         db.execSQL(DBContract.CalibrationEntry.CREATE_TABLE);
-        ContentValues values = new ContentValues();
         for(int i=0; i < c.calibration.length; i++) {
+            ContentValues values = new ContentValues();
             values.put(DBContract.CalibrationEntry.COLUMN_NAME_BECON_NUM, i);
             values.put(DBContract.CalibrationEntry.COLUMN_NAME_P1, c.calibration[i][0]);
             values.put(DBContract.CalibrationEntry.COLUMN_NAME_P2, c.calibration[i][1]);
+            values.put(DBContract.CalibrationEntry.COLUMN_NAME_P3, c.calibration[i][2]);
+            db.insert(DBContract.CalibrationEntry.TABLE_NAME, null, values);
         }
-        long id = db.insert(DBContract.CalibrationEntry.TABLE_NAME, null, values);
-        return id;
     }
 }

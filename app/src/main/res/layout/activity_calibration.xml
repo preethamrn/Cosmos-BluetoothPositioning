@@ -26,4 +26,26 @@
         android:layout_below="@+id/calibrateButton"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:id="@+id/distanceView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/saveCalibration"
+        android:layout_centerHorizontal="true"
+        android:text="BEACON 1" />
+    <TextView
+        android:id="@+id/distanceView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BEACON 2"
+        android:layout_below="@+id/distanceView1"
+        android:layout_alignStart="@+id/distanceView1" />
+    <TextView
+        android:id="@+id/distanceView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BEACON 3"
+        android:layout_below="@+id/distanceView2"
+        android:layout_alignStart="@+id/distanceView2" />
+
 </RelativeLayout>
