@@ -38,7 +38,7 @@ public class CalibrationActivity extends AppCompatActivity{
     DBHelper db;
 
     TextView distanceView1, distanceView2, distanceView3;
-    TextView currentLocation;
+    TextView currentLocation, currentPositionTV;
     EditText locationName;
 
     List<Location> locations;
@@ -76,10 +76,12 @@ public class CalibrationActivity extends AppCompatActivity{
             public void onClick(View view) {
                 double[] locPosition = triangulateLocation(beaconPositions, beaconDistances);
                 String name = locationName.getText().toString();
-                db.addLocation(new Location(name, locPosition, "TOAST"));
+                Location loc = new Location(name, locPosition, "TOAST");
+                db.addLocation(loc);
+                locations.add(loc);
 
                 Log.i(TAG, "Saved Location (" + name + "): " + Arrays.toString(locPosition));
-                Toast.makeText(getApplicationContext(), "Saving Location" + name, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Saving Location \"" + name + "\"", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -92,6 +94,7 @@ public class CalibrationActivity extends AppCompatActivity{
         distanceView2 = (TextView) findViewById(R.id.distanceView2);
         distanceView3 = (TextView) findViewById(R.id.distanceView3);
         currentLocation = (TextView) findViewById(R.id.currentLocation);
+        currentPositionTV = (TextView) findViewById(R.id.currentPosition);
         locationName = (EditText) findViewById(R.id.locationName);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -108,7 +111,30 @@ public class CalibrationActivity extends AppCompatActivity{
 
         h.postDelayed(new Runnable(){
             public void run() {
-
+                final double[] currentPosition = triangulateLocation(beaconPositions, beaconDistances);
+                double minimum = Double.MAX_VALUE;
+                Location minloc = null;
+                for (Location location : locations) {
+                    double distancesq = distanceSquared(currentPosition, location.getPosition());
+                    if (distancesq < minimum) {
+                        minloc = location;
+                        minimum = distancesq;
+                    }
+                }
+                double distanceLimit = 0.5;
+                final String locationDisplayString;
+                if (minloc != null && minimum < distanceLimit * distanceLimit) {
+                    locationDisplayString = "Current Location: " + minloc.getLocation();
+                } else {
+                    locationDisplayString = "Current Location: null";
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        currentPositionTV.setText("Current Position: " + Arrays.toString(currentPosition));
+                        currentLocation.setText(locationDisplayString);
+                    }
+                });
                 h.postDelayed(this, delay);
             }
         }, delay);
@@ -165,5 +191,12 @@ public class CalibrationActivity extends AppCompatActivity{
         */
 
         return centroid;
+    }
+
+    private double distanceSquared(double[] l1, double[] l2) {
+        double c1 = l1[0] - l2[0];
+        double c2 = l1[1] - l2[1];
+        double c3 = l1[2] - l2[2];
+        return (c1 * c1) + (c2 * c2) + (c3 * c3);
     }
 }
