@@ -5,7 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/Cosmos-BluetoothPositioning.iml" filepath="$PROJECT_DIR$/Cosmos-BluetoothPositioning.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/proximitykit-android-0.13.0/proximitykit-android-0.13.0.iml" filepath="$PROJECT_DIR$/proximitykit-android-0.13.0/proximitykit-android-0.13.0.iml" />
-      <module fileurl="file://$PROJECT_DIR$/proximitykit-android-0.13.0/proximitykit-android-0.13.0.iml" filepath="$PROJECT_DIR$/proximitykit-android-0.13.0/proximitykit-android-0.13.0.iml" />
     </modules>
   </component>
 </project>

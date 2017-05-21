@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -80,6 +81,16 @@ public class CalibrationActivity extends AppCompatActivity{
 
         Log.i("testing", Arrays.toString(triangulateLocation(new double[][]{positions[0], positions[1]}, new double[]{distances[0], distances[1]})));
 
+
+        final Handler h = new Handler();
+        final int delay = 1000;
+
+        h.postDelayed(new Runnable(){
+            public void run() {
+
+                h.postDelayed(this, delay);
+            }
+        }, delay);
     }
 
     @Override
