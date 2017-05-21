@@ -25,32 +25,39 @@ public class CalibrationActivity extends AppCompatActivity{
     private static final String TAG = "CalibrationActivity";
     private final int MY_PERMISSION_REQUEST_LOCATION = 1;
 
-    double[][] positions = new double[][]{{0,0}, {3,4}};
-    double[] distances = new double[]{6, 1};
+    double[][] positions = new double[][]{{0,0}, {2,2}, {3,3}};
+    double[] distances = new double[]{4.2426, 1.4142, 0};
+
+    DBHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calibration);
 
-        findViewById(R.id.calibrateButton1).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.calibrateButton).setOnClickListener(new View.OnClickListener() {
+            private int calibrateState = 0;
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Clicked calibrate button 1", Toast.LENGTH_SHORT).show();
+                switch(calibrateState) {
+                    case 0: positions[0] = new double[]{0,0}; Toast.makeText(getApplicationContext(), "Calibrating beacon 1", Toast.LENGTH_SHORT).show(); break;
+                    case 1: positions[1] = new double[]{2,2}; Toast.makeText(getApplicationContext(), "Calibrating beacon 2", Toast.LENGTH_SHORT).show(); break;
+                    case 2: positions[2] = new double[]{3,3}; Toast.makeText(getApplicationContext(), "Calibrating beacon 3", Toast.LENGTH_SHORT).show(); break;
+                    default: Toast.makeText(getApplicationContext(), "Calibration finished.", Toast.LENGTH_SHORT).show(); break;
+                }
+                calibrateState++;
             }
         });
-        findViewById(R.id.calibrateButton2).setOnClickListener(new View.OnClickListener() {
+
+        findViewById(R.id.saveCalibration).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Clicked calibrate button 2", Toast.LENGTH_SHORT).show();
+                db.addCalibration(new Calibration(positions[0], positions[1], positions[2]));
+                Toast.makeText(getApplicationContext(), "Saving calibration", Toast.LENGTH_SHORT).show();
             }
         });
-        findViewById(R.id.calibrateButton3).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Clicked calibrate button 3", Toast.LENGTH_SHORT).show();
-            }
-        });
+
+        db = new DBHelper(getApplicationContext());
 
         NonLinearLeastSquaresSolver solver = new NonLinearLeastSquaresSolver(new TrilaterationFunction(positions, distances), new LevenbergMarquardtOptimizer());
         LeastSquaresOptimizer.Optimum optimum = solver.solve();

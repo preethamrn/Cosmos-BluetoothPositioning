@@ -11,26 +11,19 @@
     tools:context="com.rhombus.cosmos.CalibrationActivity">
 
     <Button
-        android:text="Calibrate 1"
+        android:text="Calibrate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/calibrateButton1"
+        android:id="@+id/calibrateButton"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
+
     <Button
-        android:text="Calibrate 2"
+        android:text="Save Calibration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/calibrateButton2"
-        android:layout_below="@+id/calibrateButton1"
-        android:layout_alignLeft="@+id/calibrateButton3"
-        android:layout_alignStart="@+id/calibrateButton3" />
-    <Button
-        android:text="Calibrate 3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/calibrateButton3"
-        android:layout_below="@+id/calibrateButton2"
-        android:layout_alignLeft="@+id/calibrateButton1"
-        android:layout_alignStart="@+id/calibrateButton1" />
+        android:id="@+id/saveCalibration"
+        android:layout_below="@+id/calibrateButton"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
