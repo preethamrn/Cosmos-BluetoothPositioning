@@ -1,1 +1,1 @@
-include ':app'
+include ':app', ':proximitykit-android-0.13.0'
