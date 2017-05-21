@@ -48,4 +48,30 @@
         android:layout_below="@+id/distanceView2"
         android:layout_alignStart="@+id/distanceView2" />
 
+    <Button
+        android:id="@+id/saveLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save Location"
+        android:layout_below="@+id/distanceView3"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/currentLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current Location: null"
+        android:layout_below="@+id/saveLocation"
+        android:layout_alignStart="@+id/saveLocation" />
+
+    <EditText
+        android:id="@+id/locationName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Enter location name"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
