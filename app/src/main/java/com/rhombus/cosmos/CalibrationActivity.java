@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,18 +25,23 @@ import org.apache.commons.math3.linear.RealVector;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.List;
 
 public class CalibrationActivity extends AppCompatActivity{
 
     private static final String TAG = "CalibrationActivity";
     private final int MY_PERMISSION_REQUEST_LOCATION = 1;
 
-    double[][] positions = new double[][]{{0,0,0}, {0,0,0}, {0,0,0}};
-    double[] distances = new double[]{0, 0, 0};
+    double[][] beaconPositions = new double[][]{{0,0,0}, {0,0,0}, {0,0,0}};
+    double[] beaconDistances = new double[]{0, 0, 0};
 
     DBHelper db;
 
     TextView distanceView1, distanceView2, distanceView3;
+    TextView currentLocation;
+    EditText locationName;
+
+    List<Location> locations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +53,9 @@ public class CalibrationActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 switch(calibrateState) {
-                    case 0: positions[0] = new double[]{0,0,0}; Toast.makeText(getApplicationContext(), "Calibrating beacon 1", Toast.LENGTH_SHORT).show(); break;
-                    case 1: positions[1] = new double[]{distances[0]/Math.sqrt(2),distances[0]/Math.sqrt(2),0}; Toast.makeText(getApplicationContext(), "Calibrating beacon 2", Toast.LENGTH_SHORT).show(); break;
-                    case 2: positions[2] = triangulateLocation(new double[][]{positions[0], positions[1]}, new double[]{distances[0], distances[1]}); Toast.makeText(getApplicationContext(), "Calibrating beacon 3", Toast.LENGTH_SHORT).show(); break;
+                    case 0: beaconPositions[0] = new double[]{0,0,0}; Toast.makeText(getApplicationContext(), "Calibrating beacon 1", Toast.LENGTH_SHORT).show(); break;
+                    case 1: beaconPositions[1] = new double[]{beaconDistances[0]/Math.sqrt(2),beaconDistances[0]/Math.sqrt(2),0}; Toast.makeText(getApplicationContext(), "Calibrating beacon 2", Toast.LENGTH_SHORT).show(); break;
+                    case 2: beaconPositions[2] = triangulateLocation(new double[][]{beaconPositions[0], beaconPositions[1]}, new double[]{beaconDistances[0], beaconDistances[1]}); Toast.makeText(getApplicationContext(), "Calibrating beacon 3", Toast.LENGTH_SHORT).show(); break;
                     default: Toast.makeText(getApplicationContext(), "Calibration finished.", Toast.LENGTH_SHORT).show(); break;
                 }
                 calibrateState++;
@@ -59,19 +65,34 @@ public class CalibrationActivity extends AppCompatActivity{
         findViewById(R.id.saveCalibration).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i(TAG, "Saved Calibration: " + "{" + Arrays.toString(positions[0]) + ", " + Arrays.toString(positions[1]) + ", " + Arrays.toString(positions[2]) + "}");
-                db.addCalibration(new Calibration(positions[0], positions[1], positions[2]));
+                Log.i(TAG, "Saved Calibration: " + "{" + Arrays.toString(beaconPositions[0]) + ", " + Arrays.toString(beaconPositions[1]) + ", " + Arrays.toString(beaconPositions[2]) + "}");
+                db.addCalibration(new Calibration(beaconPositions[0], beaconPositions[1], beaconPositions[2]));
                 Toast.makeText(getApplicationContext(), "Saving calibration", Toast.LENGTH_SHORT).show();
             }
         });
 
+        findViewById(R.id.saveLocation).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                double[] locPosition = triangulateLocation(beaconPositions, beaconDistances);
+                String name = locationName.getText().toString();
+                db.addLocation(new Location(name, locPosition, "TOAST"));
+
+                Log.i(TAG, "Saved Location (" + name + "): " + Arrays.toString(locPosition));
+                Toast.makeText(getApplicationContext(), "Saving Location" + name, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         db = new DBHelper(getApplicationContext());
-        positions = db.getCalibration();
-        Log.i(TAG, "Initial Positions: " + "{" + Arrays.toString(positions[0]) + ", " + Arrays.toString(positions[1]) + ", " + Arrays.toString(positions[2]) + "}");
+        beaconPositions = db.getCalibration();
+        locations = db.getLocations();
+        Log.i(TAG, "Initial Positions: " + "{" + Arrays.toString(beaconPositions[0]) + ", " + Arrays.toString(beaconPositions[1]) + ", " + Arrays.toString(beaconPositions[2]) + "}");
 
         distanceView1 = (TextView) findViewById(R.id.distanceView1);
         distanceView2 = (TextView) findViewById(R.id.distanceView2);
         distanceView3 = (TextView) findViewById(R.id.distanceView3);
+        currentLocation = (TextView) findViewById(R.id.currentLocation);
+        locationName = (EditText) findViewById(R.id.locationName);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_LOCATION);
@@ -79,7 +100,7 @@ public class CalibrationActivity extends AppCompatActivity{
 
         ((CosmosApplication)getApplication()).setCalibrationActivity(this);
 
-        Log.i("testing", Arrays.toString(triangulateLocation(new double[][]{positions[0], positions[1]}, new double[]{distances[0], distances[1]})));
+        Log.i("testing", Arrays.toString(triangulateLocation(new double[][]{beaconPositions[0], beaconPositions[1]}, new double[]{beaconDistances[0], beaconDistances[1]})));
 
 
         final Handler h = new Handler();
@@ -113,7 +134,7 @@ public class CalibrationActivity extends AppCompatActivity{
 
     public void updateDistance(final int id, final double distance) {
         Log.i(TAG, "ID: " + id + ", distance: " + distance);
-        distances[id-1] = distance;
+        beaconDistances[id-1] = distance;
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

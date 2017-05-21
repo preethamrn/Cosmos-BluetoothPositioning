@@ -56,7 +56,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 String action = c.getString(c.getColumnIndex(DBContract.LocationEntry.COLUMN_NAME_ACTION));
 
                 // adding to list
-                returnList.add(new Location(location, p1, p2, p3, action));
+                returnList.add(new Location(location, new double[]{p1, p2, p3}, action));
             } while (c.moveToNext());
         }
         c.close();
