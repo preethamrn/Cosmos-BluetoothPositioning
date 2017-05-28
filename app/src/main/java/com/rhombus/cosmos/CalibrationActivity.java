@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -32,6 +34,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,23 +94,55 @@ public class CalibrationActivity extends AppCompatActivity{
                final Spinner spAction = (Spinner) alertLayout.findViewById(R.id.spinner_action);
                final LinearLayout notificationLayout = (LinearLayout) alertLayout.findViewById(R.id.notification);
                final LinearLayout linkLayout = (LinearLayout) alertLayout.findViewById(R.id.link);
+               final LinearLayout appLayout = (LinearLayout) alertLayout.findViewById(R.id.app);
                final EditText etNotificationText = (EditText) alertLayout.findViewById(R.id.et_notification_text);
                final EditText etLinkURL = (EditText) alertLayout.findViewById(R.id.et_link_url);
+               final Spinner spOpenApp = (Spinner) alertLayout.findViewById(R.id.spinner_open_app);
 
                final StringBuilder s = new StringBuilder();
 
+               final PackageManager pm = getPackageManager();
+                //get a list of installed apps.
+               List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+               ArrayList<String> packagesNames = new ArrayList<String>();
+               ApplicationInfo ai;
+               for (ApplicationInfo packageInfo : packages) {
+                   try{
+                       ai = pm.getApplicationInfo( packageInfo.packageName, 0);
+                   } catch (final PackageManager.NameNotFoundException e) {
+                       ai = null;
+                   }
+
+                   if (ai != null) {
+                       packagesNames.add((String)pm.getApplicationLabel(ai));
+                   }
+                   //packagesNames.add(packageInfo.packageName);
+
+//                   Log.d(TAG, "Installed package :" + packageInfo.packageName);
+//                   Log.d(TAG, "Source dir : " + packageInfo.sourceDir);
+//                   Log.d(TAG, "Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
+               }
+
+               ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(CalibrationActivity.this, android.R.layout.simple_spinner_item, packagesNames);
+               spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+               spOpenApp.setAdapter(spinnerArrayAdapter);
+                // the getLaunchIntentForPackage returns an intent that you can use with startActivity()
 
                spAction.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                    @Override
                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                        notificationLayout.setVisibility(View.GONE);
                        linkLayout.setVisibility(View.GONE);
+                       appLayout.setVisibility(View.GONE);
                        switch(position) {
                            case 1:
                                notificationLayout.setVisibility(View.VISIBLE);
                                break;
                            case 2:
                                linkLayout.setVisibility(View.VISIBLE);
+                               break;
+                           case 3:
+                               appLayout.setVisibility(View.VISIBLE);
                                break;
                        }
                    }
@@ -145,6 +180,8 @@ public class CalibrationActivity extends AppCompatActivity{
                                 break;
                             case "Open an App":
                                 s.append("APP");
+                                s.append("\n");
+                                s.append(spOpenApp.getSelectedItem().toString());
                                 break;
                         }
 
