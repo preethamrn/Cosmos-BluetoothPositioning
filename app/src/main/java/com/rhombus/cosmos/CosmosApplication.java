@@ -59,7 +59,7 @@ public class CosmosApplication extends Application implements ProximityKitRangeN
         pkManager.setProximityKitSyncNotifier(this);
 
         pkManager.getBeaconManager().setRssiFilterImplClass(RunningAverageRssiFilter.class);
-        RunningAverageRssiFilter.setSampleExpirationMilliseconds(1000l);
+        RunningAverageRssiFilter.setSampleExpirationMilliseconds(100l);
 
         pkManager.start();
 

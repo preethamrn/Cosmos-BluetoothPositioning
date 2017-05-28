@@ -36,8 +36,11 @@ import org.apache.commons.math3.linear.RealVector;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 public class CalibrationActivity extends AppCompatActivity{
@@ -105,7 +108,8 @@ public class CalibrationActivity extends AppCompatActivity{
                final PackageManager pm = getPackageManager();
                 //get a list of installed apps.
                List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-               ArrayList<String> packagesNames = new ArrayList<String>();
+               ArrayList<String> appNames = new ArrayList<String>();
+               final Map<String, String> packagesNames = new HashMap<String, String>();
                ApplicationInfo ai;
                for (ApplicationInfo packageInfo : packages) {
                    try{
@@ -115,7 +119,11 @@ public class CalibrationActivity extends AppCompatActivity{
                    }
 
                    if (ai != null) {
-                       packagesNames.add((String)pm.getApplicationLabel(ai));
+                       Intent i = pm.getLaunchIntentForPackage(packageInfo.packageName);
+                       if (i != null) {
+                           appNames.add((String) pm.getApplicationLabel(ai));
+                           packagesNames.put((String) pm.getApplicationLabel(ai), packageInfo.packageName);
+                       }
                    }
                    //packagesNames.add(packageInfo.packageName);
 
@@ -123,8 +131,9 @@ public class CalibrationActivity extends AppCompatActivity{
 //                   Log.d(TAG, "Source dir : " + packageInfo.sourceDir);
 //                   Log.d(TAG, "Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
                }
+               Collections.sort(appNames);
 
-               ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(CalibrationActivity.this, android.R.layout.simple_spinner_item, packagesNames);
+               ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(CalibrationActivity.this, android.R.layout.simple_spinner_item, appNames);
                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                spOpenApp.setAdapter(spinnerArrayAdapter);
                 // the getLaunchIntentForPackage returns an intent that you can use with startActivity()
@@ -182,7 +191,7 @@ public class CalibrationActivity extends AppCompatActivity{
                             case "Open an App":
                                 s.append("APP");
                                 s.append("\n");
-                                s.append(spOpenApp.getSelectedItem().toString());
+                                s.append(packagesNames.get(spOpenApp.getSelectedItem().toString()));
                                 break;
                         }
 
@@ -325,12 +334,19 @@ public class CalibrationActivity extends AppCompatActivity{
             mNotifyMgr.notify(mNotificationId, mBuilder.build());
         } else if("LINK".equals(parts[0].toUpperCase())) {
             String link = parts[1];
+            if (!"http://".equals(link.substring(0, 7)) && !"https://".equals(link.substring(0, 8))) {
+                link = "http://" + link;
+            }
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(link));
             startActivity(intent);
         } else if("APP".equals(parts[0].toUpperCase())) {
             Intent intent = getPackageManager().getLaunchIntentForPackage(parts[1]);
-            startActivity(intent);
+            if (intent != null) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(), "Null Intent: " + parts[1], Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(getApplicationContext(), "Location: " + minloc.getLocation(), Toast.LENGTH_LONG).show();
         }
