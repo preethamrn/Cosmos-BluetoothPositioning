@@ -13,8 +13,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,18 +76,74 @@ public class CalibrationActivity extends AppCompatActivity{
         });
 
         findViewById(R.id.saveLocation).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                double[] locPosition = triangulateLocation(beaconPositions, beaconDistances);
-                String name = locationName.getText().toString();
-                Location loc = new Location(name, locPosition, "TOAST");
-                db.addLocation(loc);
-                locations.add(loc);
+           @Override
+           public void onClick(View view) {
 
-                Log.i(TAG, "Saved Location (" + name + "): " + Arrays.toString(locPosition));
-                Toast.makeText(getApplicationContext(), "Saving Location \"" + name + "\"", Toast.LENGTH_SHORT).show();
-            }
-        });
+
+
+               LayoutInflater inflater = getLayoutInflater();
+               View alertLayout = inflater.inflate(R.layout.save_location_popup, null);
+               final EditText etName = (EditText) alertLayout.findViewById(R.id.et_name);
+               final Spinner spAction = (Spinner) alertLayout.findViewById(R.id.spinner_action);
+               final LinearLayout notificationLayout = (LinearLayout) alertLayout.findViewById(R.id.notification);
+               final LinearLayout linkLayout = (LinearLayout) alertLayout.findViewById(R.id.link);
+               final EditText etNotificationText = (EditText) alertLayout.findViewById(R.id.et_notification_text);
+               final EditText etLinkURL = (EditText) alertLayout.findViewById(R.id.et_link_url);
+
+               final StringBuilder s = new StringBuilder();
+
+               spAction.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                   @Override
+                   public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                       notificationLayout.setVisibility(View.GONE);
+                       linkLayout.setVisibility(View.GONE);
+                       switch(position) {
+                           case 1: notificationLayout.setVisibility(View.VISIBLE); break;
+                           case 2: linkLayout.setVisibility(View.VISIBLE); break;
+                       }
+                   }
+               });
+
+               AlertDialog.Builder alert = new AlertDialog.Builder(getApplicationContext());
+               alert.setTitle("Location");
+               alert.setView(alertLayout);
+               alert.setCancelable(true);
+               alert.setNegativeButton("Cancle", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                       Toast.makeText(getBaseContext(), "Cancel clicked", Toast.LENGTH_SHORT).show();
+                   }
+               });
+
+               alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialog, int which) {
+                        switch(spAction.getSelectedItem().toString()) {
+                            case "Show a Notification":
+                                s.append("not");
+                                s.append("\n");
+                                s.append(etNotificationText.getText().toString());
+                                break;
+                            case "Open a Link":
+                                s.append("lnk");
+                                break;
+                            case "Open an App":
+                                s.append("app");
+                                break;
+                        }
+
+                       double[] locPosition = triangulateLocation(beaconPositions, beaconDistances);
+                       String name = etName.getText().toString();
+                       Location loc = new Location(name, locPosition, s.toString());
+                       db.addLocation(loc);
+                       locations.add(loc);
+                       Log.i(TAG, "Saved Location (" + name + "): " + Arrays.toString(locPosition));
+                       Toast.makeText(getApplicationContext(), "Saving Location \"" + name + "\"", Toast.LENGTH_SHORT).show();
+                   }
+               });
+           }
+       });
+
 
         db = new DBHelper(getApplicationContext());
         beaconPositions = db.getCalibration();
