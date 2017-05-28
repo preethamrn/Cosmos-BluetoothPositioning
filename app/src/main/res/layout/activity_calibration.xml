@@ -72,15 +72,4 @@
         android:layout_below="@+id/currentLocation"
         android:layout_alignStart="@+id/currentLocation" />
 
-    <EditText
-        android:id="@+id/locationName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Enter location name"
-        android:layout_below="@+id/currentPosition"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp" />
-
 </RelativeLayout>

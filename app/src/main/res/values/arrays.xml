@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spinner_actions">
+        <item>Select an Action</item>
+        <item>Show a Notification</item>
+        <item>Open a Link</item>
+        <item>Open an App</item>
+    </string-array>
+</resources>
