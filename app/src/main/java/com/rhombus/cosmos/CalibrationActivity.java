@@ -205,12 +205,12 @@ public class CalibrationActivity extends AppCompatActivity{
 
     private void performAction(Location minloc) {
         String action = minloc.getAction();
-        String parts[] = action.split(" ");
+        String parts[] = action.split("\n");
         if("NOTIFICATION".equals(parts[0].toUpperCase())) {
             NotificationCompat.Builder mBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                             .setSmallIcon(R.drawable.notification_icon)
-                            .setContentTitle("NOTIFICATION")
-                            .setContentText("Location: " + minloc.getLocation());
+                            .setContentTitle(minloc.getLocation())
+                            .setContentText(parts[1]);
             int mNotificationId = 1;
             NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             mNotifyMgr.notify(mNotificationId, mBuilder.build());
