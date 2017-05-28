@@ -102,6 +102,8 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(DBContract.CalibrationEntry.DELETE_TABLE);
         db.execSQL(DBContract.CalibrationEntry.CREATE_TABLE);
+        db.execSQL(DBContract.LocationEntry.DELETE_TABLE);
+        db.execSQL(DBContract.LocationEntry.CREATE_TABLE);
         for(int i=0; i < c.calibration.length; i++) {
             ContentValues values = new ContentValues();
             values.put(DBContract.CalibrationEntry.COLUMN_NAME_BECON_NUM, i);

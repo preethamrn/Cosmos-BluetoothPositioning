@@ -3,8 +3,11 @@ package com.rhombus.cosmos;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -12,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +33,9 @@ import org.apache.commons.math3.linear.RealVector;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class CalibrationActivity extends AppCompatActivity{
 
@@ -46,6 +52,7 @@ public class CalibrationActivity extends AppCompatActivity{
     EditText locationName;
 
     List<Location> locations;
+    List<String> last20Locations = new LinkedList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,6 +189,29 @@ public class CalibrationActivity extends AppCompatActivity{
                     }
                 }
                 double distanceLimit = 0.5;
+                if (minloc != null) {
+                    if (minimum < distanceLimit * distanceLimit) {
+                        boolean alreadyActioned = false;
+                        for (String locString : last20Locations) {
+                            if (locString == minloc.getLocation()) {
+                                alreadyActioned = true;
+                                break;
+                            }
+                        }
+                        if (!alreadyActioned) {
+                            performAction(minloc);
+                        }
+                        last20Locations.add(minloc.getLocation());
+                        if(last20Locations.size() > 10) {
+                            last20Locations.remove(0);
+                        }
+                    } else {
+                        last20Locations.add("NULL Location");
+                        if(last20Locations.size() > 10) {
+                            last20Locations.remove(0);
+                        }
+                    }
+                }
                 final String locationDisplayString;
                 if (minloc != null && minimum < distanceLimit * distanceLimit) {
                     locationDisplayString = "Current Location: " + minloc.getLocation();
@@ -231,6 +261,27 @@ public class CalibrationActivity extends AppCompatActivity{
                 }
             }
         });
+    }
+
+    private void performAction(Location minloc) {
+        String action = minloc.getAction();
+        String parts[] = action.split(" ");
+        if("NOTIFICATION".equals(parts[0].toUpperCase())) {
+            NotificationCompat.Builder mBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                            .setSmallIcon(R.drawable.notification_icon)
+                            .setContentTitle("NOTIFICATION")
+                            .setContentText("Location: " + minloc.getLocation());
+            int mNotificationId = 1;
+            NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        } else if("LINK".equals(parts[0].toUpperCase())) {
+            String link = parts[1];
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(link));
+            startActivity(intent);
+        } else {
+            Toast.makeText(getApplicationContext(), "Location: " + minloc.getLocation(), Toast.LENGTH_LONG).show();
+        }
     }
 
 
