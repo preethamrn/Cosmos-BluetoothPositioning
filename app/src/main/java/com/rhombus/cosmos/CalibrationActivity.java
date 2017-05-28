@@ -49,7 +49,6 @@ public class CalibrationActivity extends AppCompatActivity{
 
     TextView distanceView1, distanceView2, distanceView3;
     TextView currentLocation, currentPositionTV;
-    EditText locationName;
 
     List<Location> locations;
     List<String> last20Locations = new LinkedList<>();
@@ -86,8 +85,6 @@ public class CalibrationActivity extends AppCompatActivity{
            @Override
            public void onClick(View view) {
 
-
-
                LayoutInflater inflater = getLayoutInflater();
                View alertLayout = inflater.inflate(R.layout.save_location_popup, null);
                final EditText etName = (EditText) alertLayout.findViewById(R.id.et_name);
@@ -99,23 +96,33 @@ public class CalibrationActivity extends AppCompatActivity{
 
                final StringBuilder s = new StringBuilder();
 
-               spAction.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+               spAction.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                    @Override
-                   public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                   public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                        notificationLayout.setVisibility(View.GONE);
                        linkLayout.setVisibility(View.GONE);
                        switch(position) {
-                           case 1: notificationLayout.setVisibility(View.VISIBLE); break;
-                           case 2: linkLayout.setVisibility(View.VISIBLE); break;
+                           case 1:
+                               notificationLayout.setVisibility(View.VISIBLE);
+                               break;
+                           case 2:
+                               linkLayout.setVisibility(View.VISIBLE);
+                               break;
                        }
+                   }
+
+                   @Override
+                   public void onNothingSelected(AdapterView<?> parent) {
+
                    }
                });
 
-               AlertDialog.Builder alert = new AlertDialog.Builder(getApplicationContext());
+               AlertDialog.Builder alert = new AlertDialog.Builder(CalibrationActivity.this);
                alert.setTitle("Location");
                alert.setView(alertLayout);
                alert.setCancelable(true);
-               alert.setNegativeButton("Cancle", new DialogInterface.OnClickListener() {
+               alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                    @Override
                    public void onClick(DialogInterface dialog, int which) {
                        Toast.makeText(getBaseContext(), "Cancel clicked", Toast.LENGTH_SHORT).show();
@@ -127,15 +134,17 @@ public class CalibrationActivity extends AppCompatActivity{
                    public void onClick(DialogInterface dialog, int which) {
                         switch(spAction.getSelectedItem().toString()) {
                             case "Show a Notification":
-                                s.append("not");
+                                s.append("NOTIFICATION");
                                 s.append("\n");
                                 s.append(etNotificationText.getText().toString());
                                 break;
                             case "Open a Link":
-                                s.append("lnk");
+                                s.append("LINK");
+                                s.append("\n");
+                                s.append(etLinkURL.getText().toString());
                                 break;
                             case "Open an App":
-                                s.append("app");
+                                s.append("APP");
                                 break;
                         }
 
@@ -148,6 +157,9 @@ public class CalibrationActivity extends AppCompatActivity{
                        Toast.makeText(getApplicationContext(), "Saving Location \"" + name + "\"", Toast.LENGTH_SHORT).show();
                    }
                });
+
+               AlertDialog dialog = alert.create();
+               dialog.show();
            }
        });
 
@@ -162,7 +174,6 @@ public class CalibrationActivity extends AppCompatActivity{
         distanceView3 = (TextView) findViewById(R.id.distanceView3);
         currentLocation = (TextView) findViewById(R.id.currentLocation);
         currentPositionTV = (TextView) findViewById(R.id.currentPosition);
-        locationName = (EditText) findViewById(R.id.locationName);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_LOCATION);
