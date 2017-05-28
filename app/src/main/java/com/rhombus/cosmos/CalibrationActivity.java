@@ -76,6 +76,7 @@ public class CalibrationActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Saved Calibration: " + "{" + Arrays.toString(beaconPositions[0]) + ", " + Arrays.toString(beaconPositions[1]) + ", " + Arrays.toString(beaconPositions[2]) + "}");
+                locations.clear();
                 db.addCalibration(new Calibration(beaconPositions[0], beaconPositions[1], beaconPositions[2]));
                 Toast.makeText(getApplicationContext(), "Saving calibration", Toast.LENGTH_SHORT).show();
             }
@@ -289,6 +290,9 @@ public class CalibrationActivity extends AppCompatActivity{
             String link = parts[1];
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(link));
+            startActivity(intent);
+        } else if("APP".equals(parts[0].toUpperCase())) {
+            Intent intent = getPackageManager().getLaunchIntentForPackage(parts[1]);
             startActivity(intent);
         } else {
             Toast.makeText(getApplicationContext(), "Location: " + minloc.getLocation(), Toast.LENGTH_LONG).show();
