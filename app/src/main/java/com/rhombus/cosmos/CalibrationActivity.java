@@ -33,7 +33,6 @@ import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +40,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 public class CalibrationActivity extends AppCompatActivity{
 
@@ -55,9 +53,10 @@ public class CalibrationActivity extends AppCompatActivity{
 
     TextView distanceView1, distanceView2, distanceView3;
     TextView currentLocation, currentPositionTV;
+    BluetoothPositionView bpv;
 
     List<Location> locations;
-    List<String> last20Locations = new LinkedList<>();
+    List<String> lastLocations = new LinkedList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,14 +221,13 @@ public class CalibrationActivity extends AppCompatActivity{
         currentLocation = (TextView) findViewById(R.id.currentLocation);
         currentPositionTV = (TextView) findViewById(R.id.currentPosition);
 
+        bpv = (BluetoothPositionView) findViewById(R.id.bluetoothPositionView);
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_LOCATION);
         }
 
         ((CosmosApplication)getApplication()).setCalibrationActivity(this);
-
-        Log.i("testing", Arrays.toString(triangulateLocation(new double[][]{beaconPositions[0], beaconPositions[1]}, new double[]{beaconDistances[0], beaconDistances[1]})));
-
 
         final Handler h = new Handler();
         final int delay = 1000;
@@ -246,11 +244,11 @@ public class CalibrationActivity extends AppCompatActivity{
                         minimum = distancesq;
                     }
                 }
-                double distanceLimit = 0.5;
+                double distanceLimit = 0.25;
                 if (minloc != null) {
                     if (minimum < distanceLimit * distanceLimit) {
                         boolean alreadyActioned = false;
-                        for (String locString : last20Locations) {
+                        for (String locString : lastLocations) {
                             if (locString == minloc.getLocation()) {
                                 alreadyActioned = true;
                                 break;
@@ -259,14 +257,14 @@ public class CalibrationActivity extends AppCompatActivity{
                         if (!alreadyActioned) {
                             performAction(minloc);
                         }
-                        last20Locations.add(minloc.getLocation());
-                        if(last20Locations.size() > 10) {
-                            last20Locations.remove(0);
+                        lastLocations.add(minloc.getLocation());
+                        if(lastLocations.size() > 10) {
+                            lastLocations.remove(0);
                         }
                     } else {
-                        last20Locations.add("NULL Location");
-                        if(last20Locations.size() > 10) {
-                            last20Locations.remove(0);
+                        lastLocations.add("NULL Location");
+                        if(lastLocations.size() > 10) {
+                            lastLocations.remove(0);
                         }
                     }
                 }
@@ -281,6 +279,10 @@ public class CalibrationActivity extends AppCompatActivity{
                     public void run() {
                         currentPositionTV.setText("Current Position: " + Arrays.toString(currentPosition));
                         currentLocation.setText(locationDisplayString);
+
+                        bpv.x = 100*((int) currentPosition[0]);
+                        bpv.y = 100*((int) currentPosition[1]);
+                        bpv.invalidate();
                     }
                 });
                 h.postDelayed(this, delay);

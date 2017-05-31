@@ -1,0 +1,303 @@
+[1mdiff --git a/app/src/main/java/com/rhombus/cosmos/BluetoothPositionView.java b/app/src/main/java/com/rhombus/cosmos/BluetoothPositionView.java[m
+[1mindex 553574f..2574533 100644[m
+[1m--- a/app/src/main/java/com/rhombus/cosmos/BluetoothPositionView.java[m
+[1m+++ b/app/src/main/java/com/rhombus/cosmos/BluetoothPositionView.java[m
+[36m@@ -6,6 +6,8 @@[m [mimport android.graphics.Canvas;[m
+ import android.graphics.Color;[m
+ import android.graphics.Paint;[m
+ import android.graphics.drawable.Drawable;[m
+[32m+[m[32mimport android.graphics.drawable.ShapeDrawable;[m
+[32m+[m[32mimport android.graphics.drawable.shapes.OvalShape;[m
+ import android.text.TextPaint;[m
+ import android.util.AttributeSet;[m
+ import android.view.View;[m
+[36m@@ -14,168 +16,28 @@[m [mimport android.view.View;[m
+  * TODO: document your custom view class.[m
+  */[m
+ public class BluetoothPositionView extends View {[m
+[31m-    private String mExampleString; // TODO: use a default from R.string...[m
+[31m-    private int mExampleColor = Color.RED; // TODO: use a default from R.color...[m
+[31m-    private float mExampleDimension = 0; // TODO: use a default from R.dimen...[m
+[31m-    private Drawable mExampleDrawable;[m
+ [m
+[31m-    private TextPaint mTextPaint;[m
+[31m-    private float mTextWidth;[m
+[31m-    private float mTextHeight;[m
+[32m+[m[32m    private ShapeDrawable mDrawable;[m
+[32m+[m[32m    public int x = 10;[m
+[32m+[m[32m    public int y = 10;[m
+[32m+[m[32m    public int width = 300;[m
+[32m+[m[32m    public int height = 50;[m
+ [m
+     public BluetoothPositionView(Context context) {[m
+         super(context);[m
+[31m-        init(null, 0);[m
+     }[m
+[31m-[m
+     public BluetoothPositionView(Context context, AttributeSet attrs) {[m
+         super(context, attrs);[m
+[31m-        init(attrs, 0);[m
+     }[m
+[31m-[m
+     public BluetoothPositionView(Context context, AttributeSet attrs, int defStyle) {[m
+         super(context, attrs, defStyle);[m
+[31m-        init(attrs, defStyle);[m
+[31m-    }[m
+[31m-[m
+[31m-    private void init(AttributeSet attrs, int defStyle) {[m
+[31m-        // Load attributes[m
+[31m-        final TypedArray a = getContext().obtainStyledAttributes([m
+[31m-                attrs, R.styleable.BluetoothPositionView, defStyle, 0);[m
+[31m-[m
+[31m-        mExampleString = a.getString([m
+[31m-                R.styleable.BluetoothPositionView_exampleString);[m
+[31m-        mExampleColor = a.getColor([m
+[31m-                R.styleable.BluetoothPositionView_exampleColor,[m
+[31m-                mExampleColor);[m
+[31m-        // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with[m
+[31m-        // values that should fall on pixel boundaries.[m
+[31m-        mExampleDimension = a.getDimension([m
+[31m-                R.styleable.BluetoothPositionView_exampleDimension,[m
+[31m-                mExampleDimension);[m
+[31m-[m
+[31m-        if (a.hasValue(R.styleable.BluetoothPositionView_exampleDrawable)) {[m
+[31m-            mExampleDrawable = a.getDrawable([m
+[31m-                    R.styleable.BluetoothPositionView_exampleDrawable);[m
+[31m-            mExampleDrawable.setCallback(this);[m
+[31m-        }[m
+[31m-[m
+[31m-        a.recycle();[m
+[31m-[m
+[31m-        // Set up a default TextPaint object[m
+[31m-        mTextPaint = new TextPaint();[m
+[31m-        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);[m
+[31m-        mTextPaint.setTextAlign(Paint.Align.LEFT);[m
+[31m-[m
+[31m-        // Update TextPaint and text measurements from attributes[m
+[31m-        invalidateTextPaintAndMeasurements();[m
+[31m-    }[m
+[31m-[m
+[31m-    private void invalidateTextPaintAndMeasurements() {[m
+[31m-        mTextPaint.setTextSize(mExampleDimension);[m
+[31m-        mTextPaint.setColor(mExampleColor);[m
+[31m-        mTextWidth = mTextPaint.measureText(mExampleString);[m
+[31m-[m
+[31m-        Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();[m
+[31m-        mTextHeight = fontMetrics.bottom;[m
+     }[m
+ [m
+[31m-    @Override[m
+     protected void onDraw(Canvas canvas) {[m
+[31m-        super.onDraw(canvas);[m
+[31m-[m
+[31m-        // TODO: consider storing these as member variables to reduce[m
+[31m-        // allocations per draw cycle.[m
+[31m-        int paddingLeft = getPaddingLeft();[m
+[31m-        int paddingTop = getPaddingTop();[m
+[31m-        int paddingRight = getPaddingRight();[m
+[31m-        int paddingBottom = getPaddingBottom();[m
+[31m-[m
+[31m-        int contentWidth = getWidth() - paddingLeft - paddingRight;[m
+[31m-        int contentHeight = getHeight() - paddingTop - paddingBottom;[m
+[31m-[m
+[31m-        // Draw the text.[m
+[31m-        canvas.drawText(mExampleString,[m
+[31m-                paddingLeft + (contentWidth - mTextWidth) / 2,[m
+[31m-                paddingTop + (contentHeight + mTextHeight) / 2,[m
+[31m-                mTextPaint);[m
+[31m-[m
+[31m-        // Draw the example drawable on top of the text.[m
+[31m-        if (mExampleDrawable != null) {[m
+[31m-            mExampleDrawable.setBounds(paddingLeft, paddingTop,[m
+[31m-                    paddingLeft + contentWidth, paddingTop + contentHeight);[m
+[31m-            mExampleDrawable.draw(canvas);[m
+[31m-        }[m
+[32m+[m[32m        mDrawable = new ShapeDrawable(new OvalShape());[m
+[32m+[m[32m        mDrawable.getPaint().setColor(0xff74AC23);[m
+[32m+[m[32m        mDrawable.setBounds(x, y, x + width, y + height);[m
+[32m+[m[32m        mDrawable.draw(canvas);[m
+     }[m
+ [m
+[31m-    /**[m
+[31m-     * Gets the example string attribute value.[m
+[31m-     * @return The example string attribute value.[m
+[31m-     */[m
+[31m-    public String getExampleString() {[m
+[31m-        return mExampleString;[m
+[31m-    }[m
+[31m-[m
+[31m-    /**[m
+[31m-     * Sets the view's example string attribute value. In the example view, this string[m
+[31m-     * is the text to draw.[m
+[31m-     * @param exampleString The example string attribute value to use.[m
+[31m-     */[m
+[31m-    public void setExampleString(String exampleString) {[m
+[31m-        mExampleString = exampleString;[m
+[31m-        invalidateTextPaintAndMeasurements();[m
+[31m-    }[m
+[31m-[m
+[31m-    /**[m
+[31m-     * Gets the example color attribute value.[m
+[31m-     * @return The example color attribute value.[m
+[31m-     */[m
+[31m-    public int getExampleColor() {[m
+[31m-        return mExampleColor;[m
+[31m-    }[m
+[31m-[m
+[31m-    /**[m
+[31m-     * Sets the view's example color attribute value. In the example view, this color[m
+[31m-     * is the font color.[m
+[31m-     * @param exampleColor The example color attribute value to use.[m
+[31m-     */[m
+[31m-    public void setExampleColor(int exampleColor) {[m
+[31m-        mExampleColor = exampleColor;[m
+[31m-        invalidateTextPaintAndMeasurements();[m
+[31m-    }[m
+[31m-[m
+[31m-    /**[m
+[31m-     * Gets the example dimension attribute value.[m
+[31m-     * @return The example dimension attribute value.[m
+[31m-     */[m
+[31m-    public float getExampleDimension() {[m
+[31m-        return mExampleDimension;[m
+[31m-    }[m
+[31m-[m
+[31m-    /**[m
+[31m-     * Sets the view's example dimension attribute value. In the example view, this dimension[m
+[31m-     * is the font size.[m
+[31m-     * @param exampleDimension The example dimension attribute value to use.[m
+[31m-     */[m
+[31m-    public void setExampleDimension(float exampleDimension) {[m
+[31m-        mExampleDimension = exampleDimension;[m
+[31m-        invalidateTextPaintAndMeasurements();[m
+[31m-    }[m
+[31m-[m
+[31m-    /**[m
+[31m-     * Gets the example drawable attribute value.[m
+[31m-     * @return The example drawable attribute value.[m
+[31m-     */[m
+[31m-    public Drawable getExampleDrawable() {[m
+[31m-        return mExampleDrawable;[m
+[31m-    }[m
+[31m-[m
+[31m-    /**[m
+[31m-     * Sets the view's example drawable attribute value. In the example view, this drawable is[m
+[31m-     * drawn above the text.[m
+[31m-     * @param exampleDrawable The example drawable attribute value to use.[m
+[31m-     */[m
+[31m-    public void setExampleDrawable(Drawable exampleDrawable) {[m
+[31m-        mExampleDrawable = exampleDrawable;[m
+[31m-    }[m
+ }[m
+[1mdiff --git a/app/src/main/java/com/rhombus/cosmos/CalibrationActivity.java b/app/src/main/java/com/rhombus/cosmos/CalibrationActivity.java[m
+[1mindex e868995..6904165 100644[m
+[1m--- a/app/src/main/java/com/rhombus/cosmos/CalibrationActivity.java[m
+[1m+++ b/app/src/main/java/com/rhombus/cosmos/CalibrationActivity.java[m
+[36m@@ -33,7 +33,6 @@[m [mimport org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer[m
+ import org.apache.commons.math3.linear.RealMatrix;[m
+ import org.apache.commons.math3.linear.RealVector;[m
+ [m
+[31m-import java.lang.reflect.Array;[m
+ import java.util.ArrayList;[m
+ import java.util.Arrays;[m
+ import java.util.Collections;[m
+[36m@@ -41,7 +40,6 @@[m [mimport java.util.HashMap;[m
+ import java.util.LinkedList;[m
+ import java.util.List;[m
+ import java.util.Map;[m
+[31m-import java.util.Queue;[m
+ [m
+ public class CalibrationActivity extends AppCompatActivity{[m
+ [m
+[36m@@ -55,9 +53,10 @@[m [mpublic class CalibrationActivity extends AppCompatActivity{[m
+ [m
+     TextView distanceView1, distanceView2, distanceView3;[m
+     TextView currentLocation, currentPositionTV;[m
+[32m+[m[32m    //BluetoothPositionView bpv;[m
+ [m
+     List<Location> locations;[m
+[31m-    List<String> last20Locations = new LinkedList<>();[m
+[32m+[m[32m    List<String> lastLocations = new LinkedList<>();[m
+ [m
+     @Override[m
+     protected void onCreate(Bundle savedInstanceState) {[m
+[36m@@ -222,15 +221,14 @@[m [mpublic class CalibrationActivity extends AppCompatActivity{[m
+         currentLocation = (TextView) findViewById(R.id.currentLocation);[m
+         currentPositionTV = (TextView) findViewById(R.id.currentPosition);[m
+ [m
+[32m+[m[32m        //bpv = (BluetoothPositionView) findViewById(R.id.bluetoothPositionView);[m
+[32m+[m
+         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {[m
+             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_LOCATION);[m
+         }[m
+ [m
+         ((CosmosApplication)getApplication()).setCalibrationActivity(this);[m
+ [m
+[31m-        Log.i("testing", Arrays.toString(triangulateLocation(new double[][]{beaconPositions[0], beaconPositions[1]}, new double[]{beaconDistances[0], beaconDistances[1]})));[m
+[31m-[m
+[31m-[m
+         final Handler h = new Handler();[m
+         final int delay = 1000;[m
+ [m
+[36m@@ -246,11 +244,11 @@[m [mpublic class CalibrationActivity extends AppCompatActivity{[m
+                         minimum = distancesq;[m
+                     }[m
+                 }[m
+[31m-                double distanceLimit = 0.5;[m
+[32m+[m[32m                double distanceLimit = 0.25;[m
+                 if (minloc != null) {[m
+                     if (minimum < distanceLimit * distanceLimit) {[m
+                         boolean alreadyActioned = false;[m
+[31m-                        for (String locString : last20Locations) {[m
+[32m+[m[32m                        for (String locString : lastLocations) {[m
+                             if (locString == minloc.getLocation()) {[m
+                                 alreadyActioned = true;[m
+                                 break;[m
+[36m@@ -259,14 +257,14 @@[m [mpublic class CalibrationActivity extends AppCompatActivity{[m
+                         if (!alreadyActioned) {[m
+                             performAction(minloc);[m
+                         }[m
+[31m-                        last20Locations.add(minloc.getLocation());[m
+[31m-                        if(last20Locations.size() > 10) {[m
+[31m-                            last20Locations.remove(0);[m
+[32m+[m[32m                        lastLocations.add(minloc.getLocation());[m
+[32m+[m[32m                        if(lastLocations.size() > 10) {[m
+[32m+[m[32m                            lastLocations.remove(0);[m
+                         }[m
+                     } else {[m
+[31m-                        last20Locations.add("NULL Location");[m
+[31m-                        if(last20Locations.size() > 10) {[m
+[31m-                            last20Locations.remove(0);[m
+[32m+[m[32m                        lastLocations.add("NULL Location");[m
+[32m+[m[32m                        if(lastLocations.size() > 10) {[m
+[32m+[m[32m                            lastLocations.remove(0);[m
+                         }[m
+                     }[m
+                 }[m
+[36m@@ -281,6 +279,10 @@[m [mpublic class CalibrationActivity extends AppCompatActivity{[m
+                     public void run() {[m
+                         currentPositionTV.setText("Current Position: " + Arrays.toString(currentPosition));[m
+                         currentLocation.setText(locationDisplayString);[m
+[32m+[m
+[32m+[m[32m                        //bpv.x = 100*((int) currentPosition[0]);[m
+[32m+[m[32m                        //bpv.y = 100*((int) currentPosition[1]);[m
+[32m+[m[32m                        //bpv.invalidate();[m
+                     }[m
+                 });[m
+                 h.postDelayed(this, delay);[m
+[1mdiff --git a/app/src/main/res/layout/activity_calibration.xml b/app/src/main/res/layout/activity_calibration.xml[m
+[1mindex 8c4a176..6d2339a 100644[m
+[1m--- a/app/src/main/res/layout/activity_calibration.xml[m
+[1m+++ b/app/src/main/res/layout/activity_calibration.xml[m
+[36m@@ -72,4 +72,11 @@[m
+         android:layout_below="@+id/currentLocation"[m
+         android:layout_alignStart="@+id/currentLocation" />[m
+ [m
+[32m+[m[32m    <!--<com.rhombus.cosmos.BluetoothPositionView[m
+[32m+[m[32m        android:id="@+id/bluetoothPositionView"[m
+[32m+[m[32m        android:layout_height="wrap_content"[m
+[32m+[m[32m        android:layout_width="wrap_content"[m
+[32m+[m[32m        android:layout_below="@+id/currentPosition"[m
+[32m+[m[32m        android:layout_centerHorizontal="true" />-->[m
+[32m+[m
+ </RelativeLayout>[m

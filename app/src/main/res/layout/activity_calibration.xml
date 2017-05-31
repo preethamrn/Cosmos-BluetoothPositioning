@@ -72,4 +72,11 @@
         android:layout_below="@+id/currentLocation"
         android:layout_alignStart="@+id/currentLocation" />
 
+    <com.rhombus.cosmos.BluetoothPositionView
+        android:id="@+id/bluetoothPositionView"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_below="@+id/currentPosition"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
