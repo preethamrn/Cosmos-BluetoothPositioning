@@ -46,6 +46,8 @@ public class CalibrationActivity extends AppCompatActivity{
     private static final String TAG = "CalibrationActivity";
     private final int MY_PERMISSION_REQUEST_LOCATION = 1;
 
+    private final int distanceScale = 200;
+
     double[][] beaconPositions = new double[][]{{0,0,0}, {0,0,0}, {0,0,0}};
     double[] beaconDistances = new double[]{0, 0, 0};
 
@@ -68,9 +70,21 @@ public class CalibrationActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 switch(calibrateState) {
-                    case 0: beaconPositions[0] = new double[]{0,0,0}; Toast.makeText(getApplicationContext(), "Calibrating beacon 1", Toast.LENGTH_SHORT).show(); break;
-                    case 1: beaconPositions[1] = new double[]{beaconDistances[0]/Math.sqrt(2),beaconDistances[0]/Math.sqrt(2),0}; Toast.makeText(getApplicationContext(), "Calibrating beacon 2", Toast.LENGTH_SHORT).show(); break;
-                    case 2: beaconPositions[2] = triangulateLocation(new double[][]{beaconPositions[0], beaconPositions[1]}, new double[]{beaconDistances[0], beaconDistances[1]}); Toast.makeText(getApplicationContext(), "Calibrating beacon 3", Toast.LENGTH_SHORT).show(); break;
+                    case 0: beaconPositions[0] = new double[]{0,0,0};
+                        Toast.makeText(getApplicationContext(), "Calibrating beacon 1", Toast.LENGTH_SHORT).show();
+                        bpv.b1x = (int) (distanceScale *  beaconPositions[0][0]);
+                        bpv.b1y = (int) (distanceScale * beaconPositions[0][1]);
+                        break;
+                    case 1: beaconPositions[1] = new double[]{beaconDistances[0]/Math.sqrt(2),beaconDistances[0]/Math.sqrt(2),0};
+                        Toast.makeText(getApplicationContext(), "Calibrating beacon 2", Toast.LENGTH_SHORT).show();
+                        bpv.b2x = (int) (distanceScale *  beaconPositions[1][0]);
+                        bpv.b2y = (int) (distanceScale * beaconPositions[1][1]);
+                        break;
+                    case 2: beaconPositions[2] = triangulateLocation(new double[][]{beaconPositions[0], beaconPositions[1]}, new double[]{beaconDistances[0], beaconDistances[1]});
+                        Toast.makeText(getApplicationContext(), "Calibrating beacon 3", Toast.LENGTH_SHORT).show();
+                        bpv.b3x = (int) (distanceScale *  beaconPositions[2][0]);
+                        bpv.b3y = (int) (distanceScale * beaconPositions[2][1]);
+                        break;
                     default: Toast.makeText(getApplicationContext(), "Calibration finished.", Toast.LENGTH_SHORT).show(); break;
                 }
                 calibrateState++;
@@ -222,6 +236,12 @@ public class CalibrationActivity extends AppCompatActivity{
         currentPositionTV = (TextView) findViewById(R.id.currentPosition);
 
         bpv = (BluetoothPositionView) findViewById(R.id.bluetoothPositionView);
+        bpv.b1x = (int) (distanceScale *  beaconPositions[0][0]);
+        bpv.b1y = (int) (distanceScale * beaconPositions[0][1]);
+        bpv.b2x = (int) (distanceScale * beaconPositions[1][0]);
+        bpv.b2y = (int) (distanceScale * beaconPositions[1][1]);
+        bpv.b3x = (int) (distanceScale * beaconPositions[2][0]);
+        bpv.b3y = (int) (distanceScale * beaconPositions[2][1]);
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_LOCATION);
@@ -280,8 +300,8 @@ public class CalibrationActivity extends AppCompatActivity{
                         currentPositionTV.setText("Current Position: " + Arrays.toString(currentPosition));
                         currentLocation.setText(locationDisplayString);
 
-                        bpv.x = 100*((int) currentPosition[0]);
-                        bpv.y = 100*((int) currentPosition[1]);
+                        bpv.x = (int) (distanceScale * currentPosition[0]);
+                        bpv.y = (int) (distanceScale * currentPosition[1]);
                         bpv.invalidate();
                     }
                 });
