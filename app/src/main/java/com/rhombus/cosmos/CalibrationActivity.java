@@ -33,6 +33,7 @@ import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -297,7 +298,7 @@ public class CalibrationActivity extends AppCompatActivity{
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        currentPositionTV.setText("Current Position: " + Arrays.toString(currentPosition));
+                        currentPositionTV.setText("Current Position: [" + (new DecimalFormat("#0.000").format(currentPosition[0])) + ", " + (new DecimalFormat("#0.000").format(currentPosition[1])) + "]");
                         currentLocation.setText(locationDisplayString);
 
                         bpv.x = (int) (distanceScale * currentPosition[0]);
